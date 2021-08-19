@@ -23,4 +23,7 @@ domain/?page=test
 def api(params):
     return {'message':params}
 ```
-
+- UI
+```
+url = domain/docs      #開啟可執行API之UI介面
+```
