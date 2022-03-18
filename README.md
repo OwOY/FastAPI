@@ -42,6 +42,13 @@ def test(request:get_data):
     data = request.get_data
     return srv.test(data)
 ```
+- response
+```
+from fastapi.responses import JSONResponse
+@app.post('/')
+def test():
+    return JSONResponse(status_code=400, message={'foo':'bar'})
+```
 ### Model
 ```
 class Srv:
