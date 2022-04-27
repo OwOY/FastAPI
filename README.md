@@ -36,9 +36,17 @@ class GetData(BaseModel):
     list:list
 ```
 - api
+#### Get
+```
+from fastapi import Depends
+@app.get('/')
+def test(request:GetData = Depends())
+    return srv.test()
+```
+#### Post
 ```
 @app.post('/')
-def test(request:get_data):
+def test(request:GetData):
     data = request.get_data
     return srv.test(data)
 ```
