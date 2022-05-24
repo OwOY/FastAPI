@@ -71,7 +71,7 @@ from fastapi.responses import JSONResponse
 def test():
     return JSONResponse(status_code=400, message={'foo':'bar'})
 ```
-### Model
+### Service
 ```
 class Srv:
     def test(data):
