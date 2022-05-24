@@ -7,7 +7,7 @@
 ```
 python -m pip install fastapi
 ```
-- uvicorn
+- uvicorn # fastapi使用uvicorn
 ```
 python -m pip install uvicorn
 ```
@@ -19,6 +19,17 @@ python -m pip install uvicorn
 from fastapi import FastAPI
 app = FastAPI()
 ```
+- Setting
+```
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
 - Run
 ```
 uvicorn.run(f'{filename}:app', host:'0.0.0.0', port=8089, reload=True)
@@ -29,11 +40,14 @@ uvicorn.run(f'{filename}:app', host:'0.0.0.0', port=8089, reload=True)
 - docs
 ```
 from pydantic import BaseModel
+from typing import Optional, List
 
 class GetData(BaseModel):
     string:str
     integer:int
     list:list
+    foo:List[int] # list內為int
+    bar:Optional[str] # 參數可填可不填
 ```
 - api
 #### Get
