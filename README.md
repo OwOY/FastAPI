@@ -71,6 +71,20 @@ from fastapi.responses import JSONResponse
 def test():
     return JSONResponse(status_code=400, message={'foo':'bar'})
 ```
+- UploadFile
+```
+from fastapi import UploadFile
+@app.post('/uploadExcel')
+def upload_excel(file_name:UploadFile)
+    file = file_name.file # SpooledTemporaryFile
+    file_name = file_name.filename # filename
+    return srv.test(file_name)
+
+!! requests post
+files = {'file_name':binary} # file_name 對應API
+response = requests.post(url, files=files)
+```
+
 ### Service
 ```
 class Srv:
