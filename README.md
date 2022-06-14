@@ -49,7 +49,7 @@ class GetData(BaseModel):
     foo:List[int] # list內為int
     bar:Optional[str] # 參數可填可不填
 ```
-- api
+
 #### Get
 ```
 from fastapi import Depends
@@ -94,4 +94,16 @@ class Srv:
 ### View
 ```
 url = domain/docs      #開啟可執行API之UI介面
+```
+
+## 大架構使用案例
+- Controller
+```
+from fastapi import APIRouter
+```
+
+- mainapp
+```
+from controller.user import users
+app.include_router(users.router)
 ```
