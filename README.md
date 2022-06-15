@@ -100,12 +100,18 @@ url = domain/docs      #開啟可執行API之UI介面
 - Controller
 ```
 from fastapi import APIRouter
+api = APIRouter()
+
+@api.get('/test')
+def test():
+    return srv.test()
 ```
 
 - mainapp
 ```
-from controller.user import users
-app.include_router(users.router)
+# add api
+from controller.user import users as user_api
+app.include_router(user_api)
 ```
 ---- 
 # fastapi + SQLalchemy
