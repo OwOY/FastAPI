@@ -91,28 +91,35 @@ class Srv:
     def test(data):
         return 'hello world'
 ```
-### View
+### 物件轉換json
 ```
-url = domain/docs      #開啟可執行API之UI介面
+from fastapi.encoder import jsonable_encoder
+obj = session.query(ObjTest).first()
+data_dict = jsonable_encoder(obj)
+```
+
+### 啟動排程設置
+- schedule.py
+```
+class BackgroundTask(threading.Thread):
+    def run(self, *arg, **kwarg):
+        from time import sleep
+        while True:
+            print('hello world')
+            sleep(10)
+```
+- mainapp.py
+```
+from schedule import BackgroundTask
+from fastapi import FastAPI
+
+app = FastAPI()
+@app.on_event('startup')
+def scheduler():
+    task = BackgroundTask()
+    task.run()
 ```
 
 ## 大架構使用案例
-- Controller
-```
-from fastapi import APIRouter
-api = APIRouter()
-
-@api.get('/test')
-def test():
-    return srv.test()
-```
-
-- mainapp
-```
-# add api
-from controller.user import users as user_api
-app.include_router(user_api)
-```
----- 
-# fastapi + SQLalchemy
+- fastapi + SQLalchemy  
 參閱 [Reserve專案](https://github.com/OwOY/side_project/tree/main/reserve) 
