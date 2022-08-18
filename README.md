@@ -35,6 +35,39 @@ app.add_middleware(
 uvicorn.run(f'{filename}:app', host:'0.0.0.0', port=8089, reload=True)
 ```
 >> filename為該檔案之名稱   reload為自動刷新功能(程式碼變更即更改)  
+### model
+- model/basemodel.py
+```
+from cfg.debug import engine
+from sqlalchemy import MetaData
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.schema import CreateSchema
+from sqlalchemy.ext.declarative import declarative_base
+
+sess = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+session = sess()
+
+schema = 'test'
+try:
+    engine.execute(CreateSchema(schema)) # 創建Schema(PostgreSQL)
+except:
+    pass
+meta_obj = MetaData(schema=schema)
+Base = declarative_base(metadata=meta_obj) # 指定使用相依Base
+from model.test import objTest
+Base.metadata.create_all(bind=engine) # 自動建立databases
+```
+- model/test.py
+```
+from basemodel import Base
+from sqlalchemy import Column, Integer, Sequence
+
+class ObjTest(Base):
+    __tablename__ = 'TBL_TEST'
+    # id 
+    id = Column(Integer, Sequence('TBL_TEST_id_seq'), primary_key=True, nullable=False)
+
+```
 
 ### Controller
 - docs
