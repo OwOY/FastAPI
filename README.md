@@ -184,9 +184,14 @@ class Setting(BaseSetting):
     test:str
 print(Setting().test) # TESTENV
 ```
-- 執行時命令
+- Uvicorn CMD執行時命令
 ```
 uvicorn --env-file=".env"
+```
+- Gunicorn CMD執行時命令(Windows不適用)
+```
+# 官方文件設置
+gunicorn mainapp:app --worker 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8888
 ```
 
 ### 使用Request傳輸自定義變數
