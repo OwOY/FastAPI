@@ -188,11 +188,6 @@ print(Setting().test) # TESTENV
 ```
 uvicorn --env-file=".env"
 ```
-- Gunicorn CMD執行時命令(Windows不適用)
-```
-# 官方文件設置
-gunicorn mainapp:app --worker 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8888
-```
 
 ### 使用Request傳輸自定義變數
 ```
@@ -203,6 +198,14 @@ def test(request:Request)
     return func(request)
 ```
 
+### Gunicorn 
+- Gunicorn CMD執行時命令(Windows不適用)
+```
+# 官方文件設置
+gunicorn mainapp:app --worker 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8888
+```
+- Gunicorn Config設定  
+![gunicorn.conf.py](/gunicorn.conf.py)
 
 ## 大架構使用案例
 - fastapi + SQLalchemy  
