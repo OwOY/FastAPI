@@ -11,58 +11,39 @@ python -m pip install fastapi
 ```
 python -m pip install uvicorn
 ```
+- 若有上傳檔案，則需下載額外套件
+```
+python -m pip install python-multipart
+```
 --------------------------------------------------
 ## How to use fastapi
-- mainapp  
+#### mainapp  
 主要執行程式
-- config  
-設定檔
 ```
-from sqlalchemy import create_engine
+import uvicorn
+from fastapi import FastAPI
 
-DIALCT = "mysql" # DB名稱
-DRIVER = "pymysql" # DB連線套件
-USERNAME = "root" # 帳號
-PASSWORD = "PassW0rd" # 密碼
-HOST = "127.0.0.1" # 連線位置
-PORT = "3306" # 埠號
-DATABASE = "bps-mm" # 使用DB
-DB_URL = f"{DIALCT}+{DRIVER}://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
+app = FastAPI(title='demo') # 可設置swagger標題以及路徑
 
-engine = create_engine(DB_URL)
-```
-- model  
-用於定義連線、資料庫設置  
 
-#### 相依資料庫設置
+if __name__ == '__main__':
+    uvicorn.run('mainapp:app', host='0.0.0.0', port=8888)
 ```
-from sqlalchemy import MetaData
-from sqlalchemy.ext.declarative import declarative_base
-meta_obj = MetaData(schema=schema)
-Base = declarative_base(metadata=meta_obj)
+- CORS設置
 ```
-#### 自動建立Schema
-```
-from config import engine
-from sqlalchemy.schema import CreateSchema
+from fastapi.middleware.cors import CORSMiddleware
 
-schema = 'test'
-engine.execute(CreateSchema(schema))
+app.add_middleware(
+    CORSMiddleware, 
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 ```
-#### 自動建立TABLE
-```
-schema = 'test'
-meta_obj = MetaData(schema=schema)
-Base.metadata.create_all(bind=engine)
-```
-#### 設置連線
-```
-sess = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-session = sess()
-```
-- Controller  
+#### Controller  
 用於製作API設置
-#### API設置
 ```
 from fastapi.routing import APIRouter
 
@@ -71,14 +52,14 @@ api = APIRouter(prefix='/test', # 設定路由初始路徑
                 route_class=LogRoute) # 設置API相依類
 ```
 
-#### Get
+- Get
 ```
 from fastapi import Depends
 @api.get('/')
 def test(request:GetData = Depends())
     return srv.test()
 ```
-#### Post
+- Post
 ```
 @api.post('/')
 def test(request:GetData):
@@ -89,24 +70,24 @@ def test(request:GetData):
 ```
 from fastapi import UploadFile
 @api.post('/uploadExcel')
-def upload_excel(file_name:UploadFile)
+def upload_excel(file:UploadFile)
     file = file_name.file # SpooledTemporaryFile
     file_name = file_name.filename # filename
     return srv.test(file_name)
 
 !! requests post
-files = {'file_name':binary} # file_name 對應API
+files = {'file':binary} # file_name 對應API
 response = requests.post(url, files=files)
 ```
 
-- Service  
+#### Service  
 主要計算邏輯
 ```
 class Srv:
     def test(data):
         return 'hello world'
 ```
-### 物件轉換json
+- 物件轉換json
 ```
 from fastapi.encoder import jsonable_encoder
 obj = session.query(ObjTest).first()
@@ -168,7 +149,12 @@ class LogRoute(APIRoute):
             response: Response = await original_route_handler(request)
             return response
 ```
-### 環境變數檔案設置
+## 環境變數設置
+###  直接設置環境變數
+```
+set test=test
+```
+### 讀取環境變數檔案
 - 下載相依套件
 ```
 python -m pip install python-dotenv
@@ -189,7 +175,7 @@ print(Setting().test) # TESTENV
 uvicorn --env-file=".env"
 ```
 
-### 使用Request傳輸自定義變數
+### 使用Request傳輸自定義變數(全域)
 ```
 from fastapi import Request
 
