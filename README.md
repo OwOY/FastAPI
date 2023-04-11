@@ -130,7 +130,7 @@ app = FastAPI()
 @app.on_event('startup')
 def scheduler():
     task = BackgroundTask()
-    task.run()
+    task.start()
 ```
 ### 設置API中間層
 ```
