@@ -251,6 +251,25 @@ def tansport(func)
     return wrapper
 ```
 
+### Swagger 設立 Token驗證
+- main.py
+```
+from fastapi import FastAPI, Security, Depends
+from fastapi.security import APIKeyHeader+
+
+async def CheckHeader(
+    token_key:str=Security(APIKeyHeader(name='Authorization'))
+):
+    return token_key
+
+app = FastAPI(
+    title='test',
+    dependencies=[Depends(CheckHeader)]
+)
+
+```
+
+
 ### Gunicorn 
 - Gunicorn CMD執行時命令(Windows不適用)
     ```
