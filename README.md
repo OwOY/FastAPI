@@ -19,7 +19,7 @@
 ## How to use fastapi
 - Main  
     主要執行程式  
-    ```
+    ```python
     import uvicorn
     from fastapi import FastAPI
     
@@ -30,7 +30,7 @@
         uvicorn.run('mainapp:app', host='0.0.0.0', port=8888)
     ```
     CORS設置
-    ```
+    ```python
     from fastapi.middleware.cors import CORSMiddleware
 
     app.add_middleware(
@@ -43,27 +43,27 @@
     ```
 - Schema
     定義輸入參數  
-    ```
+    ```python
     from pydantic import BaseModel
     
     class GetData(BaseModel):
         dataId: int
     ```
     - Get
-        ```
+        ```python
         from fastapi import Depends
         
         async def test(payload:GetData=Depends())
             test_id = payload.dataId
         ```
     - Post
-        ```
+        ```python
         async def test(payload:GetData)
             test_id = payload.dataId
         ```
 - Controller  
     用於製作API設置
-    ```
+    ```python
     from fastapi.routing import APIRouter
     
     api = APIRouter(
@@ -73,7 +73,7 @@
     )
     ```
     - Get
-        ```
+        ```python
         from fastapi import Depends
     
         @api.get('/')
@@ -81,14 +81,14 @@
             return srv.test()
         ```
     - Post
-        ```
+        ```python
         @api.post('/')
         def test(request:GetData):
             data = request.get_data
             return srv.test(data)
         ```
     - UploadFile
-        ```
+        ```python
         from fastapi import UploadFile
         @api.post('/uploadExcel')
         def upload_excel(file:UploadFile)
@@ -103,13 +103,13 @@
 
 - Service  
     主要計算邏輯
-    ```
+    ```python
     class Srv:
         def test(data):
             return 'hello world'
     ```
     物件轉換json
-    ```
+    ```python
     from fastapi.encoder import jsonable_encoder
     
     obj = session.query(ObjTest).first()
@@ -117,7 +117,7 @@
     ```
     - Response
         - FileResponse
-            ```
+            ```python
             def file(path, file_name):
                 return FileResponse(
                     f'{path}', # 檔案位置
@@ -126,7 +126,7 @@
                 )
             ```
         - JsonResponse
-            ```
+            ```python
             def json_response(output):
                 return JsonResponse(
                     f'{output}, # 輸出資料
@@ -135,7 +135,7 @@
                 )
             ```
 - Schedule
-    ```
+    ```python
     class BackgroundTask(threading.Thread):
         def run(self, *arg, **kwarg):
             from time import sleep
@@ -144,7 +144,7 @@
                 sleep(10)
     ```
     - mainapp.py
-        ```
+        ```python
         from schedule import BackgroundTask
         from fastapi import FastAPI
     
@@ -156,7 +156,7 @@
         ```
 - Middleware
     - 全域中間層
-        ```
+        ```python
         from fastapi.routing import APIRoute
         from typing import Callable
         from fastapi import Request, Response
@@ -173,7 +173,7 @@
                     return response
         ```
     - 單個模塊中間層邏輯  
-        ```
+        ```python
         from fastapi import HTTPException, Request
         
         async def controller_middleware(request:Request):
@@ -183,7 +183,7 @@
                 return HTTPException('未輸入參數', 400)
         ```
         ! 注意：若要Catch message，需抓取HTTPException  
-        ```
+        ```python
         try:
             filter_controller()
         except HTTPException as err:
@@ -191,7 +191,7 @@
             msg = err.detail # 未輸入參數
         ```
         Controller設置
-        ```
+        ```python
         from fastapi import Depends
         from fastapi.router import APIRouter
         api = APIRouter()
@@ -228,11 +228,11 @@
             uvicorn --env-file="config.env"
             ```
         2. 方法2
-            ```
+            ```python
             uvicorn.run('testapp:app', env_file='config.env')
             ```
     5. config.py
-        ```
+        ```python
         from pydantic import BaseSetting
         
         class Setting(BaseSetting):
@@ -241,7 +241,7 @@
         ```
 
 ### 使用Request傳輸自定義變數(全域)
-```
+```python
 from fastapi import Request
 
 def tansport(func)
@@ -253,7 +253,7 @@ def tansport(func)
 
 ### Swagger 設立 Token驗證
 - main.py
-```
+```python
 from fastapi import FastAPI, Security, Depends
 from fastapi.security import APIKeyHeader+
 
@@ -268,7 +268,20 @@ app = FastAPI(
 )
 
 ```
+### lifespan 設置
+```python
+from fastapi import FastAPI
+from contextlib import asynccontextmanager
 
+@asynccontextmanager
+async def lifespan(app:FastAPI):
+    do something...
+    yield
+    end do something...
+
+app = FastAPI(lifespan=lifespan)
+
+```
 
 ### Gunicorn 
 - Gunicorn CMD執行時命令(Windows不適用)
