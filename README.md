@@ -18,170 +18,25 @@
 --------------------------------------------------
 ## How to use fastapi
 - Main  
-    主要執行程式  
-    ```python
-    import uvicorn
-    from fastapi import FastAPI
-    
-    app = FastAPI(title='demo') # 可設置swagger標題以及路徑
-    
-    
-    if __name__ == '__main__':
-        uvicorn.run('mainapp:app', host='0.0.0.0', port=8888)
-    ```
-    CORS設置
-    ```python
-    from fastapi.middleware.cors import CORSMiddleware
-
-    app.add_middleware(
-        CORSMiddleware, 
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    ```
+    主要執行程式    
+    ex: [main.py](sample/main.py)  
 - Schema
-    定義輸入參數  
-    ```python
-    from pydantic import BaseModel
-    
-    class GetData(BaseModel):
-        dataId: int
-    ```
-    - Get
-        ```python
-        from fastapi import Depends
-        
-        async def test(payload:GetData=Depends())
-            test_id = payload.dataId
-        ```
-    - Post
-        ```python
-        async def test(payload:GetData)
-            test_id = payload.dataId
-        ```
+    定義輸入參數    
+    ex: [schema.py](sample/schema.py)
 - Controller  
-    用於製作API設置
-    ```python
-    from fastapi.routing import APIRouter
-    
-    api = APIRouter(
-        prefix='/test', # 設定路由初始路徑
-        tags=['BuyCode維護'], # 設置Swagger標籤
-        route_class=LogRoute  # 設置API相依類
-    )
-    ```
-    - Get
-        ```python
-        from fastapi import Depends
-    
-        @api.get('/')
-        def test(request:GetData = Depends())
-            return srv.test()
-        ```
-    - Post
-        ```python
-        @api.post('/')
-        def test(request:GetData):
-            data = request.get_data
-            return srv.test(data)
-        ```
-    - UploadFile
-        ```python
-        from fastapi import UploadFile
-        @api.post('/uploadExcel')
-        def upload_excel(file:UploadFile)
-            file = file_name.file # SpooledTemporaryFile
-            file_name = file_name.filename # filename
-            return srv.test(file_name)
-    
-            !! requests post
-            files = {'file':binary} # file_name 對應API
-            response = requests.post(url, files=files)
-        ```
+    用於製作API設置  
+    ex: [controller.py](sample/controller.py)
 
 - Service  
-    主要計算邏輯
-    ```python
-    class Srv:
-        def test(data):
-            return 'hello world'
-    ```
-    物件轉換json
-    ```python
-    from fastapi.encoder import jsonable_encoder
-    
-    obj = session.query(ObjTest).first()
-    data_dict = jsonable_encoder(obj)
-    ```
-    - Response
-        - FileResponse
-            ```python
-            def file(path, file_name):
-                return FileResponse(
-                    f'{path}', # 檔案位置
-                    media_type='application/vnd.ms-excel', # 設置檔案格式(此例為Excel)
-                    filename=file_name # 設定輸出檔案名稱
-                )
-            ```
-        - JsonResponse
-            ```python
-            def json_response(output):
-                return JsonResponse(
-                    f'{output}, # 輸出資料
-                    status_code=200, # 輸出http_code
-                    headers=headers  # 設定輸出標頭
-                )
-            ```
-- Schedule
-    ```python
-    class BackgroundTask(threading.Thread):
-        def run(self, *arg, **kwarg):
-            from time import sleep
-            while True:
-                print('hello world')
-                sleep(10)
-    ```
-    - mainapp.py
-        ```python
-        from schedule import BackgroundTask
-        from fastapi import FastAPI
-    
-        app = FastAPI()
-        @app.on_event('startup')
-        def scheduler():
-            task = BackgroundTask()
-            task.start()
-        ```
+    主要計算邏輯  
+    ex: [service.py](sample/service.py)
 - Middleware
     - 全域中間層
-        ```python
-        from fastapi.routing import APIRoute
-        from typing import Callable
-        from fastapi import Request, Response
-    
-        class LogRoute(APIRoute):
-            def get_route_handler(self) -> Callable:
-                original_route_handler = super().get_route_handler()
-    
-                async def custom_route_handler(request: Request) -> Response:
-                    """
-                    Do Something
-                    """
-                    response: Response = await original_route_handler(request)
-                    return response
-        ```
+        用於做系統層面卡控  
+        ex: [middleware.py](sample/middleware.py)  
     - 單個模塊中間層邏輯  
-        ```python
-        from fastapi import HTTPException, Request
-        
-        async def controller_middleware(request:Request):
-            # payload = request.query_params._dict # 若API為GET，則使用這個
-            payload = await request.json() 
-            if not payload:
-                return HTTPException('未輸入參數', 400)
-        ```
+        用於做各服務層面卡控  
+        ex: [filter.py](sample/filter.py)  
         ! 注意：若要Catch message，需抓取HTTPException  
         ```python
         try:
@@ -190,7 +45,7 @@
             error_code = err.status_code # 400
             msg = err.detail # 未輸入參數
         ```
-        Controller設置
+        Controller套用設置
         ```python
         from fastapi import Depends
         from fastapi.router import APIRouter
@@ -202,9 +57,7 @@
                 Depends(controller_middleware),
             ]
         ):
-            ...
-        
-        ```
+        ...
 
 - Env
     ###  直接設置環境變數

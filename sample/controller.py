@@ -1,4 +1,4 @@
-from fastapi import Request, Depends
+from fastapi import Request, Depends, UploadFile
 from fastapi.routing import APIRouter
 from fastapi.responses import JSONResponse
 from middleware import LogRoute
@@ -26,3 +26,11 @@ def insert(payload:Test, session = Depends(create_session)):
     bar = payload.bar
     response = SampleService().sample(session, foo, bar)
     return JSONResponse({'message':response})
+
+@api.post('/upload')
+def upload_file(
+    file: UploadFile
+):
+    file_name = file.filename
+    file_size = file.file.read()
+    return JSONResponse({'file_name':file_name, 'file_size':len(file_size)})
